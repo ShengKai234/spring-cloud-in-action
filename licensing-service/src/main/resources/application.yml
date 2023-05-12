@@ -1,0 +1,28 @@
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      licenseService:
+#        registerHealthIndicator: true
+#        failureRateThreshold: 50
+#        minimumNumberOfCalls: 1
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        waitDurationInOpenState: 60s
+#        permittedNumberOfCallsInHalfOpenState: 10
+#        slidingWindowSize: 100
+#        slidingWindowType: COUNT_BASED
+#        slowCallRateThreshold: 100
+#        slowCallDurationThreshold: 60000
+#  timelimiter:
+#    instances:
+#      licenseService:
+#        # default waiting time
+#        timeoutDuration: 1s
+#        # is stop when a timeout occurs
+#        cancelRunningFuture: false
+#        # is throw an exception when a timeout occurs
+#        shouldCancelRunningFuture: true
+#  bulkhead:
+#    instances:
+#      ratingService:
+#        maxConcurrentCalls: 10
+#        maxWaitDuration: 10ms

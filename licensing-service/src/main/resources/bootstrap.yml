@@ -1,0 +1,164 @@
+server:
+  port: 8082
+
+logging:
+  level:
+    com.netflix: WARN
+    org.springframework.web: WARN
+    com.thoughtmechanix: DEBUG
+
+# actuator / monitor
+management:
+  security:
+    enabled: false
+  endpoint:
+    health:
+      enabled: true
+      group:
+        custom:
+          include: diskSpace,ping
+      show-details: always
+      db.enabled: false
+      diskspace.enabled: true
+    env:
+      enabled: true
+      sensitive: false
+    refresh:
+      enabled: true
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: "*"
+    enabled-by-default: false
+###
+# show env not hide
+###
+management.endpoint.env.show-values: ALWAYS
+management.endpoint.configprops.show-values: ALWAYS
+###
+# show env not hide
+###
+#management.endpoint.env.show-values: ALWAYS
+#management.endpoint.configprops.show-values: ALWAYS
+
+# spring cloud config
+spring:
+  application:
+    name: licensingservice
+  profiles:
+    active:
+      default
+  cloud:
+    config:
+      uri: http://172.23.253.154:8888
+      label: master
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true                            # pull down a local copy of the registry
+  instance:
+    prefer-ip-address: true                         # register the IP of the service rather than the server name
+#    instance-id: ${spring.cloud.client.hostname}:${server.port}
+
+resilience4j.circuitbreaker:
+  instances:
+    licenseService:
+      registerHealthIndicator: true
+      ringBufferSizeInClosedState: 5
+      ringBufferSizeInHalfOpenState: 3
+      waitDurationInOpenState: 10s
+      failureRateThreshold: 50
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.io.IOException
+        - java.util.concurrent.TimeoutException
+        - org.springframework.web.client.ResourceAccessException
+        - java.lang.ArithmeticException
+    organizationService:
+      registerHealthIndicator: true
+      ringBufferSizeInClosedState: 6
+      ringBufferSizeInHalfOpenState: 4
+      waitDurationInOpenState: 20s
+      failureRateThreshold: 60
+
+resilience4j.ratelimiter:
+  instances:
+    licenseService:
+      limitForPeriod: 5
+      limitRefreshPeriod: 5000
+      timeoutDuration: 1000ms
+
+resilience4j.retry:
+  instances:
+    retryLicenseService:
+      maxRetryAttempts: 5
+      waitDuration: 10000
+      retry-exceptions:
+        - java.util.concurrent.TimeoutException
+
+resilience4j.bulkhead:
+  configs:
+    default:
+      maxConcurrentCalls: 100
+  instances:
+    licenseService:
+      maxConcurrentCalls: 10
+    backendB:
+      maxWaitDuration: 10ms
+      maxConcurrentCalls: 20
+
+resilience4j.thread-pool-bulkhead:
+  configs:
+    default:
+      maxThreadPoolSize: 4
+      coreThreadPoolSize: 2
+      queueCapacity: 2
+  instances:
+    licenseService:
+      baseConfig: default
+    backendB:
+      maxThreadPoolSize: 1
+      coreThreadPoolSize: 1
+      queueCapacity: 1
+resilience4j.timelimiter:
+  instances:
+    licenseService:
+      # default waiting time
+      timeoutDuration: 1s
+      # is stop when a timeout occurs
+      cancelRunningFuture: false
+      # is throw an exception when a timeout occurs
+      shouldCancelRunningFuture: true
+
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      licenseService:
+#        registerHealthIndicator: true
+#        failureRateThreshold: 50
+#        minimumNumberOfCalls: 1
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        waitDurationInOpenState: 60s
+#        permittedNumberOfCallsInHalfOpenState: 10
+#        slidingWindowSize: 100
+#        slidingWindowType: COUNT_BASED
+#        slowCallRateThreshold: 100
+#        slowCallDurationThreshold: 60000
+#  timelimiter:
+#    instances:
+#      licenseService:
+#        # default waiting time
+#        timeoutDuration: 1s
+#        # is stop when a timeout occurs
+#        cancelRunningFuture: false
+#        # is throw an exception when a timeout occurs
+#        shouldCancelRunningFuture: true
+#  bulkhead:
+#    instances:
+#      ratingService:
+#        maxConcurrentCalls: 10
+#        maxWaitDuration: 10ms

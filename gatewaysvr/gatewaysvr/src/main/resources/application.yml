@@ -1,0 +1,31 @@
+# actuator / monitor
+management:
+  security:
+    enabled: false
+  endpoint:
+    health:
+      enabled: true
+      group:
+        custom:
+          include: diskSpace,ping
+      show-details: always
+      db.enabled: false
+      diskspace.enabled: true
+    env:
+      enabled: true
+      sensitive: false
+    gateway:
+      enabled: true
+    refresh:
+      enabled: true
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: "*"
+    enabled-by-default: false
+###
+# show env not hide
+###
+management.endpoint.env.show-values: ALWAYS
+management.endpoint.configprops.show-values: ALWAYS

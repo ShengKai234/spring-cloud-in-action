@@ -1,0 +1,13 @@
+
+server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false     # This is Eureka server, so don't register itself.
+    fetch-registry: false            # This is Eureka server, so don't cache
+  server:
+    wait-time-in-ms-when-sync-empty: 0  # Initial time to wait before server takes requests
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 3000
+logging.level.com.netflix.eureka: warn

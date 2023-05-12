@@ -1,0 +1,47 @@
+#
+# This is the core configuration for a configuration service.
+# - A configuration service that uses a git-based repository to read the files from GitHub.
+# - A configuration service which completelty loads the configuration for the services from
+#   the local file server of the config service.
+#   This should only be used for demonstration purposes or for a small application with a limited number of services.
+
+server:
+  port: 8888
+management:
+  endpoint:
+    encrypt:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+# JCE key
+encrypt.key: "my-config-key"
+
+####
+#Classpath and git solution
+####
+#spring:
+#  cloud:
+#    config:
+#      server:
+#        git:
+#          uri: https://github.com/carnellj/config-repo/
+#          searchPaths: licensingservice,organizationservice
+#          username: native-cloud-apps
+#          password: 0ffended
+
+####
+#Classpath and file-based solution
+####
+spring:
+   profiles:
+     active: native
+   cloud:
+      config:
+        server:
+            native:
+              #  searchLocations: file:///Users/Sign Blast/Documents/66_test_project/licensing-service/configurationserver/src/main/resources/config/licensingservice,
+              #                   file:///Users/Sign Blast/Documents/66_test_project/licensing-service/configurationserver/src/main/resources/config/organizationservice
+              searchLocations: classpath:config/,classpath:config/licensingservice,classpath:config/organizationservice

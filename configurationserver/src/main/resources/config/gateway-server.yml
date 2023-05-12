@@ -1,0 +1,37 @@
+server:
+  port: 8072
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://172.23.253.154:8761/eureka/
+spring:
+  cloud:
+    gateway:
+      # discovery.locator:
+      #   enabled: true
+      #   lowerCaseServiceId: true
+      # manually
+      routes:
+      - id: organization-serive
+        uri: lb://organizationservice
+
+        predicates: 
+        - Path=/organizationservice/**
+        
+        filters:
+        - RewritePath=/organizationservice/(?<path>.*), /$\{path}
+        - RemoveRequestHeader= Cookie,Set-Cookie
+
+      - id: licensing-serive
+        uri: lb://licensingservice
+
+        predicates: 
+        - Path=/licensingservice/**
+        
+        filters:
+        - RewritePath=/licensingservice/(?<path>.*), /$\{path}
+        - RemoveRequestHeader= Cookie,Set-Cookie

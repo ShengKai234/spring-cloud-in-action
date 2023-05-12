@@ -1,0 +1,37 @@
+example.property: "I AM IN THE DEV 777"
+spring.jpa.database: "POSTGRESQL"
+spring.datasource.platform:  "postgres"
+spring.jpa.show-sql: "false"
+spring.database.driverClassName: "org.postgresql.Driver"
+spring.datasource.url: "jdbc:postgresql://172.23.253.154:5432/eagle_eye_dev"
+spring.datasource.username: "postgres_dev"
+spring.datasource.password: "{cipher}517250fa1357d1582485380fe59df1786f5bd7e1e87acbb609dbc56033c5034e"
+spring.datasource.testWhileIdle: "true"
+spring.datasource.validationQuery: "SELECT 1"
+spring.jpa.properties.hibernate.dialect: "org.hibernate.dialect.PostgreSQLDialect"
+redis.server: "redis"
+redis.port: "6379"
+signing.key: "345345fsdfsf5345"
+
+# keycloak.enabled: false
+# keycloak.realm: spmia-realm
+# keycloak.auth-server-url: http://keycloak:8080/auth
+# keycloak.ssl-required: external
+# keycloak.resource: ostock
+# keycloak.credentials.secret: KnaEx2LHa7SIR0pY3YQpYqjgdFsKP9T4
+# keycloak.use-resource-role-mappings: true
+# keycloak.bearer-only: true
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/auth/realms/spmia-realm
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+jwt:
+  auth:
+    converter:
+      resource-id: ostock
+      principal-attribute: preferred_username
