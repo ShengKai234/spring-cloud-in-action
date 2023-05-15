@@ -1,8 +1,8 @@
 package com.thoughtmechanix.licensingservice.services;
 
-import com.thoughtmechanix.licensingservice.client.OrganizationDiscoveryClient;
-import com.thoughtmechanix.licensingservice.client.OrganizationFeignClient;
-import com.thoughtmechanix.licensingservice.client.OrganizationRestTemplateClient;
+import com.thoughtmechanix.licensingservice.services.client.OrganizationDiscoveryClient;
+import com.thoughtmechanix.licensingservice.services.client.OrganizationFeignClient;
+import com.thoughtmechanix.licensingservice.services.client.OrganizationRestTemplateClient;
 import com.thoughtmechanix.licensingservice.config.ServiceConfig;
 import com.thoughtmechanix.licensingservice.model.License;
 import com.thoughtmechanix.licensingservice.model.Organization;
@@ -13,7 +13,6 @@ import io.github.resilience4j.bulkhead.annotation.Bulkhead.Type;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -65,6 +64,8 @@ public class LicenseService {
         organization = organizationDiscoveryClient.getOrganization(organizationId);
         break;
       default:
+        organization = organizationRestTemplateClient.getOrganization(organizationId);
+        break;
 
     }
     return organization;
@@ -93,7 +94,7 @@ public class LicenseService {
 
   public License getLicense(String organizationId, String licenseId) {
     License license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
-    return license.withComment(config.getProperty());
+    return license.withComment(config.getExampleProperty());
   }
 
   public License getLicense(String organizationId, String licenseId, String clientType) {
@@ -112,20 +113,20 @@ public class LicenseService {
       license.setContactPhone(org.getContactPhone());
     }
 
-    return license.withComment(config.getProperty());
+    return license.withComment(config.getExampleProperty());
   }
 
   public License createLicense(License license) {
     license.setLicenseId(UUID.randomUUID().toString());
     licenseRepository.save(license);
 
-    return license.withComment(config.getProperty());
+    return license.withComment(config.getExampleProperty());
   }
 
   public License updateLicense(License license) {
     licenseRepository.save(license);
 
-    return license.withComment(config.getProperty());
+    return license.withComment(config.getExampleProperty());
   }
 
   public String deleteLicense(String licneseId) {

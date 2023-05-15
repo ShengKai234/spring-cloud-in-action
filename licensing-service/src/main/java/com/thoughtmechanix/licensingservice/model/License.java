@@ -5,10 +5,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.hateoas.RepresentationModel;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "licenses")
 public class License extends RepresentationModel<License> {
@@ -16,6 +20,8 @@ public class License extends RepresentationModel<License> {
   @Id
   @Column(name = "license_id", nullable = false)
   private String licenseId;
+
+  private String description;
   @Column(name = "organization_id", nullable = false)
   private String organizationId;
   @Column(name = "product_name", nullable = false)

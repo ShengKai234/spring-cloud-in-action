@@ -1,0 +1,10 @@
+version: '2'
+services:
+  database:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres_dev"
+      POSTGRES_PASSWORD: "p0stgr@s_dev"
+      POSTGRES_DB:       "eagle_eye_dev"

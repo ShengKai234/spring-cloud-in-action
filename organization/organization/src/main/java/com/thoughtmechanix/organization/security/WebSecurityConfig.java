@@ -50,7 +50,7 @@ public class WebSecurityConfig {
         .requestMatchers(HttpMethod.GET, "/test/anonymous", "/test/anonymous/**").permitAll()
         .requestMatchers(HttpMethod.GET, "/test/admin", "/test/admin/**").hasAnyRole(ADMIN)
         .requestMatchers(HttpMethod.GET, "/test/user").hasAnyRole(ADMIN, USER)
-//        .requestMatchers(HttpMethod.GET, "/v1/organizations", "v1/organizations/**").hasRole(ADMIN)
+        .requestMatchers(HttpMethod.POST, "/v1/organizations", "v1/organizations/**").hasAnyRole(ADMIN, USER)
         .anyRequest().permitAll();
     http.oauth2ResourceServer()
         .jwt()

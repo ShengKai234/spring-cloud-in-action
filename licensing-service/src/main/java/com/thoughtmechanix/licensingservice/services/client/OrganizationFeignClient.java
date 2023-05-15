@@ -1,4 +1,4 @@
-package com.thoughtmechanix.licensingservice.client;
+package com.thoughtmechanix.licensingservice.services.client;
 
 import com.thoughtmechanix.licensingservice.model.Organization;
 import org.springframework.cloud.openfeign.FeignClient;

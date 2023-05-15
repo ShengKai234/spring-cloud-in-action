@@ -1,12 +1,17 @@
 package com.thoughtmechanix.licensingservice;
 
+import com.thoughtmechanix.licensingservice.config.ServiceConfig;
+import com.thoughtmechanix.licensingservice.controller.LicenseServiceController;
+import com.thoughtmechanix.licensingservice.events.model.OrganizationChangeModel;
 import com.thoughtmechanix.licensingservice.utils.UserContextInterceptor;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
-import org.apache.catalina.User;
+import java.util.function.Consumer;
+import org.apache.kafka.common.protocol.types.Field.Str;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -14,7 +19,12 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.kafka.annotation.EnableKafkaStreams;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -24,6 +34,10 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 @EnableDiscoveryClient
 @EnableFeignClients
 public class LicensingServiceApplication {
+  private static final Logger logger = LoggerFactory.getLogger(LicenseServiceController.class);
+
+  @Autowired
+  private ServiceConfig serviceConfig;
 
   @Bean
   public LocaleResolver localeResolver() {
@@ -54,6 +68,20 @@ public class LicensingServiceApplication {
       template.setInterceptors(interceptors);
     }
     return template;
+  }
+
+  @Bean
+  public Consumer<OrganizationChangeModel> receiver() {
+    System.err.println("rev");
+    return msg -> logger.debug("Received an {} event for organization id {}", msg);
+  }
+
+  @Bean
+  JedisConnectionFactory jedisConnectionFactory() {
+    String hostname = serviceConfig.getRedisServer();
+    int port = Integer.parseInt(serviceConfig.getRedisPort());
+    RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostname, port);
+    return new JedisConnectionFactory(redisStandaloneConfiguration);
   }
 
   public static void main(String[] args) {
